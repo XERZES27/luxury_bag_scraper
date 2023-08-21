@@ -37,8 +37,13 @@ func main() {
 	var pokemonProducts []PokemonProduct
 
 	// creating a new Colly instance
-	c := colly.NewCollector()
+	c := colly.NewCollector(
+		colly.Async(true),
+	)
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+
+	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 10})
+
 	// visiting the target page
 
 	// scraping logic
@@ -60,23 +65,27 @@ func main() {
 			pokemonProduct.name,
 			pokemonProduct.price,
 		}
-		
 
 		// adding a CSV record to the output file
 		writer.Write(record)
 	})
 
 	c.OnScraped(func(r *colly.Response) {
-		
+
 		fmt.Println("Finished", len(pokemonProducts))
 
 	})
+	c.OnError(func(r *colly.Response, err error) {
+		log.Fatalln("Failure", err)
+	})
 
-
-	visitingErr := c.Visit("https://scrapeme.live/shop/")
-	if visitingErr != nil {
-		log.Fatalln("Failed to open url", visitingErr)
+	for page := 0; page < 20; page++ {
+		visitingErr := c.Visit(fmt.Sprintf("https://scrapeme.live/shop/page/%d/", page))
+		if visitingErr != nil {
+			log.Fatalln("Failed to open url", visitingErr)
+		}
 	}
-	
+
+	c.Wait()
 
 }
