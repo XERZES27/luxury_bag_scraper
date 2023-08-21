@@ -7,6 +7,6 @@ def write_to_fashion_bags_csv(file_name:str, rows: Iterable[Iterable[Any]]):
         writer = csv.writer(file)
 
         writer.writerow(
-            ["Category", "Title", "Pre Sale Price", "Sale Price", "Product Thumbnail"]
+            ["Category", "Title", "Pre Sale Price", "Sale Price", "Product Thumbnail","Product Link"]
         )
         writer.writerows(rows)

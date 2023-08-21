@@ -51,7 +51,7 @@ def scrape_products_from_category(category_name: str):
                 for price in prices:
                     product_metadata.append(price.text)
 
-                # Get product url
+                # Get product Image url
                 img_box = box.find_element(by=By.CLASS_NAME,value="image-fade_in_back")
                 img = img_box.find_element(
                     by=By.CLASS_NAME, value="size-woocommerce_thumbnail"
@@ -59,7 +59,13 @@ def scrape_products_from_category(category_name: str):
                 image_src = img.get_attribute("src")
                 if image_src is not None:
                     product_metadata.append(image_src)
-                print(img.get_attribute('class'))
+                # Get Product Url
+                link_element = img_box.find_element(by=By.TAG_NAME,value="a")
+                link = link_element.get_attribute("href")
+                if link is not None:
+                    product_metadata.append(link)
+
+
                 products_metadata.append(product_metadata)
             except NoSuchElementException:
                 print(url,str(i))
